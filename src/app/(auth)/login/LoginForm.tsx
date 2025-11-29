@@ -2,16 +2,32 @@
 
 import React from "react";
 import Link from "next/link";
-import { loginUser } from "@/actions/auth/loginUser";
 import { addToast, Button, Input } from "@heroui/react";
+import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
 
 function LoginForm() {
+  const { signIn } = useSaleorAuthContext();
   const handleLogin = async (formData: FormData) => {
-    const response = await loginUser(formData);
-    addToast({
-      title: "Login Successful",
-      description: "You have logged in successfully.",
+    const response = await signIn({
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
     });
+    const errors = response.data?.tokenCreate?.errors;
+    if (errors && errors.length > 0) {
+      errors.map((e) => {
+        addToast({
+          title: "Login Failed",
+          color: "danger",
+          description: e.message,
+        });
+      });
+    } else {
+      addToast({
+        title: "Login Successful",
+        description: "You have logged in successfully.",
+        color: "success",
+      });
+    }
   };
   return (
     <form className="my-6" action={handleLogin}>

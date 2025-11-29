@@ -11,12 +11,16 @@
     "tailwind-generate": "npx tailwindcss --input ./src/app/globals.css --output ./cypress/tailwind-generated.css"
   },
   "dependencies": {
+    "@apollo/client": "^4.0.9",
     "@heroui/react": "^2.8.5",
+    "@saleor/auth-sdk": "^1.0.3",
     "@vercel/otel": "^2.1.0",
     "framer-motion": "^12.23.24",
+    "graphql": "^16.12.0",
     "next": "15.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "rxjs": "^7.8.2",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

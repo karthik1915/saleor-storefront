@@ -4,7 +4,7 @@ import SignupForm from "./SignupForm";
 
 function SignupPage() {
   return (
-    <main className="mx-auto max-w-md p-3 my-10">
+    <main className="mx-auto max-w-lg p-3 my-10">
       <h1 className="text-2xl font-semibold text-center text-pretty ">
         Signup to create {appData.name} account
       </h1>

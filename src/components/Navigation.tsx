@@ -11,9 +11,19 @@ import {
   NavbarItem,
   Link as HeroLink,
   Button,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@heroui/react";
+import { Avatar, AvatarGroup, AvatarIcon } from "@heroui/avatar";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { gql } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
+import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
+import { useAuthState } from "@/store";
 
 export const AcmeLogo = () => {
   return (
@@ -28,8 +38,34 @@ export const AcmeLogo = () => {
   );
 };
 
+const USER_QUERY = gql`
+  query me {
+    me {
+      firstName
+      email
+      lastName
+      avatar {
+        alt
+        url
+      }
+    }
+  }
+`;
+
 export default function Navigation() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+
+  const { data, loading } = useQuery<any>(USER_QUERY, {
+    fetchPolicy: "network-only",
+  });
+  const setUser = useAuthState((state) => state.setUser);
+
+  React.useEffect(() => {
+    if (!loading && data?.me) {
+      setUser(data.me);
+    }
+  }, [loading, data, setUser]);
 
   const menuItems = [
     "Profile",
@@ -43,6 +79,14 @@ export default function Navigation() {
     "Help & Feedback",
     "Log Out",
   ];
+
+  const { signOut } = useSaleorAuthContext();
+
+  const handleLogout = () => {
+    setUser(null);
+    signOut();
+    router.push("/login");
+  };
 
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
@@ -70,26 +114,63 @@ export default function Navigation() {
         </Link>
 
         <NavbarItem>
-          <Link color="foreground" href="#">
+          <Link color="foreground" href="/products">
             Products
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link aria-current="page" href="#">
+          <Link aria-current="page" href="/categories">
             Categories
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link color="foreground" href="#">
+          <Link color="foreground" href="/collections">
             Collections
           </Link>
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <NavbarItem className="hidden lg:flex">
-          <Link href="/login">Login</Link>
+        <NavbarItem>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                radius="full"
+                showFallback
+                classNames={{
+                  base: "bg-linear-to-br from-[#ffffaa] to-[#f1f1f1]",
+                  icon: "text-black/80",
+                }}
+                className="text-md"
+                color={!loading && data?.me ? "success" : "default"}
+                name={
+                  !loading && data?.me
+                    ? data.me.firstName?.trim()
+                      ? `${data.me.firstName} ${data.me.lastName ?? ""}`.trim()
+                      : data.me.email
+                    : "Guest"
+                }
+              />
+            </DropdownTrigger>
+            <DropdownMenu>
+              <DropdownItem key="logout" onPress={handleLogout}>
+                Logout
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
         </NavbarItem>
+        {!loading && data?.me ? null : (
+          <NavbarItem className="hidden lg:flex">
+            <Button
+              onPress={() => router.push("/login")}
+              variant="faded"
+              className="text-md"
+            >
+              Login
+            </Button>
+          </NavbarItem>
+        )}
       </NavbarContent>
 
       <NavbarMenu>
@@ -98,7 +179,7 @@ export default function Navigation() {
             <HeroLink
               className="w-full"
               color={
-                index === 2
+                index === 4
                   ? "warning"
                   : index === menuItems.length - 1
                   ? "danger"
