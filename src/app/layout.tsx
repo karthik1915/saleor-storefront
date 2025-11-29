@@ -3,11 +3,13 @@ import type { Metadata } from "next";
 // Imported fonts from fonts module
 import { geistMono, geistSans } from "@/lib/fonts";
 // Css Configurations
-import "./globals.css";
+import "@/app/globals.css";
 // Entire App data
 import { appData } from "@/lib/data";
 // Providers
-import HeroProvider from "@/lib/providers/HeroProvider";
+import AppProvider from "@/lib/providers/Provider";
+// UI
+import Navigation from "@/components/Navigation";
 
 export const metadata: Metadata = {
   title: appData.name,
@@ -24,7 +26,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <HeroProvider>{children}</HeroProvider>
+        <AppProvider>
+          <Navigation />
+          {children}
+        </AppProvider>
       </body>
     </html>
   );

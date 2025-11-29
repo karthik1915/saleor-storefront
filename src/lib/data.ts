@@ -1,5 +1,5 @@
 export const appData = {
-  name: "App Starter",
+  name: "Ecommerce Storefront",
 };
 
 export const configData = {
