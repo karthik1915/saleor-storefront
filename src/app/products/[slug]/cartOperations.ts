@@ -6,7 +6,9 @@ import {
   CheckoutCountableConnection,
   CheckoutCreate,
   CheckoutLinesAdd,
+  CheckoutLinesDelete,
 } from "@/gql/graphql";
+import { addToast } from "@heroui/react";
 
 export function useCart() {
   const [fetchUserCheckouts] = useLazyQuery<{
@@ -19,10 +21,12 @@ export function useCart() {
   const [addCheckoutLine] = useMutation<{ checkoutLinesAdd: CheckoutLinesAdd }>(
     addCheckoutLineMutation
   );
+  const [deleteCheckoutLine] = useMutation<{
+    checkoutLinesDelete: CheckoutLinesDelete;
+  }>(deleteCheckoutLineMutation);
 
   const addItemToCart = async (variantId: string) => {
     const { data } = await fetchUserCheckouts();
-
     const checkout = data?.me.checkouts.edges[0]?.node;
 
     if (!checkout) {
@@ -37,16 +41,30 @@ export function useCart() {
     const res = await addCheckoutLine({
       variables: { checkoutId, variantId },
     });
+
     return res.data?.checkoutLinesAdd.checkout?.lines;
   };
 
-  return { addItemToCart };
+  const deleteItemFromCart = async (lineIds: string[]) => {
+    const { data } = await fetchUserCheckouts();
+    const checkout = data?.me.checkouts.edges[0]?.node;
+
+    const checkoutId = checkout!.id;
+
+    const res = await deleteCheckoutLine({
+      variables: { checkoutId, lineIds },
+    });
+
+    return res.data?.checkoutLinesDelete.checkout?.id;
+  };
+
+  return { addItemToCart, deleteItemFromCart };
 }
 
 const getAllCheckoutsOfCurrUser = gql`
   query myCheckouts {
     me {
-      checkouts(first: 10) {
+      checkouts(first: 1) {
         edges {
           node {
             id
@@ -104,6 +122,21 @@ const addCheckoutLineMutation = gql`
             }
           }
         }
+      }
+    }
+  }
+`;
+
+const deleteCheckoutLineMutation = gql`
+  mutation deleteCheckout($checkoutId: ID!, $lineIds: [ID!]!) {
+    checkoutLinesDelete(id: $checkoutId, linesIds: $lineIds) {
+      checkout {
+        id
+      }
+      errors {
+        field
+        message
+        code
       }
     }
   }

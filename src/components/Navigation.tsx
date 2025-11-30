@@ -27,11 +27,12 @@ import {
 } from "@heroui/react";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { gql } from "@apollo/client";
+import { User } from "@/gql/graphql";
 import { useQuery } from "@apollo/client/react";
+import { usePathname, useRouter } from "next/navigation";
 import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
-import { useAuthState } from "@/store";
+import CartCardTiny from "./product/CartCardTiny";
 
 export const AcmeLogo = () => {
   return (
@@ -56,6 +57,41 @@ const USER_QUERY = gql`
         alt
         url
       }
+      checkouts(first: 1) {
+        edges {
+          node {
+            id
+            lines {
+              id
+              variant {
+                id
+                name
+                product {
+                  id
+                  name
+                  slug
+                  thumbnail {
+                    url
+                    alt
+                  }
+                }
+              }
+              quantity
+              unitPrice {
+                gross {
+                  amount
+                }
+              }
+              totalPrice {
+                gross {
+                  amount
+                  currency
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -65,16 +101,9 @@ export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const currPath = usePathname();
 
-  const { data, loading } = useQuery<any>(USER_QUERY, {
+  const { data, loading } = useQuery<{ me: User }>(USER_QUERY, {
     fetchPolicy: "network-only",
   });
-  const setUser = useAuthState((state) => state.setUser);
-
-  React.useEffect(() => {
-    if (!loading && data?.me) {
-      setUser(data.me);
-    }
-  }, [loading, data, setUser]);
 
   const menuItems = [
     "Profile",
@@ -94,12 +123,12 @@ export default function Navigation() {
   const { signOut } = useSaleorAuthContext();
 
   const handleLogout = () => {
-    setUser(null);
     signOut();
-    router.push("/login");
+    router.refresh();
   };
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const lines = data?.me?.checkouts?.edges[0].node.lines ?? [];
 
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
@@ -150,7 +179,15 @@ export default function Navigation() {
                   <DrawerHeader className="flex flex-col gap-1">
                     My Cart
                   </DrawerHeader>
-                  <DrawerBody></DrawerBody>
+                  <DrawerBody>
+                    {lines?.length === 0 ? (
+                      <p>You Cart is Empty</p>
+                    ) : (
+                      lines.map((line) => (
+                        <CartCardTiny key={line.id} line={line} />
+                      ))
+                    )}
+                  </DrawerBody>
                   <DrawerFooter>
                     <Button color="danger" variant="light" onPress={onClose}>
                       Close

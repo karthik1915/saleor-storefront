@@ -7,7 +7,7 @@ import { Product } from "@/gql/graphql";
 import Image from "next/image";
 import { parseDescriptionJson } from "@/utils/description_json_parser";
 import { addToast, Button } from "@heroui/react";
-import { useCart } from "./addItemToCart";
+import { useCart } from "./cartOperations";
 
 const getProductBySlug = gql(`
 query product($slug: String!) {
