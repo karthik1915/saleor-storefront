@@ -123,7 +123,7 @@ function CategoryDetailsPage({ categorySlug }: { categorySlug: string }) {
             ) : productsData?.products.edges.length === 0 ? (
               <p className="text-gray-500 mt-2">No products available.</p>
             ) : (
-              <div className="flex items-center gap-4 mt-4 flex-wrap">
+              <div className="flex items-center justify-center-safe gap-4 mt-4 flex-wrap">
                 {productsData?.products.edges.map(({ node }) => (
                   <ProductCard key={node.id} product={node} />
                 ))}

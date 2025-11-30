@@ -15,11 +15,19 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  useDisclosure,
 } from "@heroui/react";
-import { Avatar, AvatarGroup, AvatarIcon } from "@heroui/avatar";
+import { Avatar } from "@heroui/avatar";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+} from "@heroui/react";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
@@ -55,6 +63,7 @@ const USER_QUERY = gql`
 export default function Navigation() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const currPath = usePathname();
 
   const { data, loading } = useQuery<any>(USER_QUERY, {
     fetchPolicy: "network-only",
@@ -80,6 +89,8 @@ export default function Navigation() {
     "Log Out",
   ];
 
+  const topMenuItems = ["Products", "Categories", "Collections"];
+
   const { signOut } = useSaleorAuthContext();
 
   const handleLogout = () => {
@@ -87,6 +98,8 @@ export default function Navigation() {
     signOut();
     router.push("/login");
   };
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
     <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
@@ -113,25 +126,43 @@ export default function Navigation() {
           </NavbarBrand>
         </Link>
 
-        <NavbarItem>
-          <Link color="foreground" href="/products">
-            Products
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link aria-current="page" href="/categories">
-            Categories
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="/collections">
-            Collections
-          </Link>
-        </NavbarItem>
+        {topMenuItems.map((item, index) => (
+          <NavbarItem
+            key={index}
+            isActive={currPath.startsWith(`/${item.toLowerCase()}`)}
+          >
+            <Link color="foreground" href={`/${item.toLowerCase()}`}>
+              {item}
+            </Link>
+          </NavbarItem>
+        ))}
       </NavbarContent>
 
       {loading ? null : (
         <NavbarContent justify="end">
+          <NavbarItem>
+            <Button onPress={onOpen}>Cart</Button>
+          </NavbarItem>
+          <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
+            <DrawerContent>
+              {(onClose) => (
+                <>
+                  <DrawerHeader className="flex flex-col gap-1">
+                    My Cart
+                  </DrawerHeader>
+                  <DrawerBody></DrawerBody>
+                  <DrawerFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    <Button color="primary" onPress={onClose}>
+                      Checkout
+                    </Button>
+                  </DrawerFooter>
+                </>
+              )}
+            </DrawerContent>
+          </Drawer>
           <NavbarItem>
             <Dropdown placement="bottom-end">
               <DropdownTrigger className="cursor-pointer">
@@ -157,6 +188,9 @@ export default function Navigation() {
                 />
               </DropdownTrigger>
               <DropdownMenu>
+                <DropdownItem key="login" onPress={() => router.push("/login")}>
+                  Login
+                </DropdownItem>
                 <DropdownItem key="logout" onPress={handleLogout}>
                   Logout
                 </DropdownItem>

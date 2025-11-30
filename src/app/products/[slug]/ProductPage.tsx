@@ -6,6 +6,8 @@ import { useQuery } from "@apollo/client/react";
 import { Product } from "@/gql/graphql";
 import Image from "next/image";
 import { parseDescriptionJson } from "@/utils/description_json_parser";
+import { addToast, Button } from "@heroui/react";
+import { useCart } from "./addItemToCart";
 
 const getProductBySlug = gql(`
 query product($slug: String!) {
@@ -14,6 +16,17 @@ query product($slug: String!) {
     name
     slug
     description
+    defaultVariant{
+      id
+      pricing{
+        price {
+          gross{
+            currency
+            amount
+          } 
+        }
+      }
+    }
     productType{
       id
       name
@@ -58,6 +71,18 @@ function ProductPage({ productSlug }: { productSlug: string }) {
 
 const ProductDetails = ({ product }: { product: Product }) => {
   const desc = parseDescriptionJson(product.description || "");
+  const { addItemToCart } = useCart();
+
+  const handleAddToCart = async () => {
+    // Implement add to cart functionality here
+    const lines = await addItemToCart(product.defaultVariant?.id!);
+    console.log(lines);
+    addToast({
+      title: "Added to Cart",
+      description: `${product.name} has been added to your cart.`,
+      color: "success",
+    });
+  };
 
   return (
     <>
@@ -71,6 +96,18 @@ const ProductDetails = ({ product }: { product: Product }) => {
         width={500}
         height={500}
       />
+
+      <div className="flex items-center justify-center gap-4 ">
+        <p>
+          {product.defaultVariant?.pricing?.price?.gross.amount}&nbsp;
+          {product.defaultVariant?.pricing?.price?.gross.currency}
+        </p>
+        <div>
+          <Button color="primary" onPress={handleAddToCart}>
+            Add to Cart
+          </Button>
+        </div>
+      </div>
     </>
   );
 };
