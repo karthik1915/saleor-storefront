@@ -130,48 +130,52 @@ export default function Navigation() {
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Avatar
-                isBordered
-                radius="full"
-                showFallback
-                classNames={{
-                  base: "bg-linear-to-br from-[#ffffaa] to-[#f1f1f1]",
-                  icon: "text-black/80",
-                }}
-                className="text-md"
-                color={!loading && data?.me ? "success" : "default"}
-                name={
-                  !loading && data?.me
-                    ? data.me.firstName?.trim()
-                      ? `${data.me.firstName} ${data.me.lastName ?? ""}`.trim()
-                      : data.me.email
-                    : "Guest"
-                }
-              />
-            </DropdownTrigger>
-            <DropdownMenu>
-              <DropdownItem key="logout" onPress={handleLogout}>
-                Logout
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-        </NavbarItem>
-        {!loading && data?.me ? null : (
-          <NavbarItem className="hidden lg:flex">
-            <Button
-              onPress={() => router.push("/login")}
-              variant="faded"
-              className="text-md"
-            >
-              Login
-            </Button>
+      {loading ? null : (
+        <NavbarContent justify="end">
+          <NavbarItem>
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger className="cursor-pointer">
+                <Avatar
+                  isBordered
+                  radius="full"
+                  showFallback
+                  classNames={{
+                    base: "bg-linear-to-br from-[#ffffaa] to-[#f1f1f1]",
+                    icon: "text-black/80",
+                  }}
+                  className="text-md"
+                  color={!loading && data?.me ? "success" : "default"}
+                  name={
+                    !loading && data?.me
+                      ? data.me.firstName?.trim()
+                        ? `${data.me.firstName} ${
+                            data.me.lastName ?? ""
+                          }`.trim()
+                        : data.me.email
+                      : "Guest"
+                  }
+                />
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownItem key="logout" onPress={handleLogout}>
+                  Logout
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </NavbarItem>
-        )}
-      </NavbarContent>
+          {!loading && data?.me ? null : (
+            <NavbarItem className="hidden lg:flex">
+              <Button
+                onPress={() => router.push("/login")}
+                variant="faded"
+                className="text-md"
+              >
+                Login
+              </Button>
+            </NavbarItem>
+          )}
+        </NavbarContent>
+      )}
 
       <NavbarMenu>
         {menuItems.map((item, index) => (
