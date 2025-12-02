@@ -1,3 +1,3 @@
-import { useAuthState } from "./useAuthState";
+import { useUserStore } from "./UserStore";
 
-export { useAuthState };
+export { useUserStore };

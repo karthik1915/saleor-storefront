@@ -7,12 +7,15 @@ import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
 
 function LoginForm() {
   const { signIn } = useSaleorAuthContext();
+
   const handleLogin = async (formData: FormData) => {
     const response = await signIn({
       email: formData.get("email") as string,
       password: formData.get("password") as string,
     });
+
     const errors = response.data?.tokenCreate?.errors;
+
     if (errors && errors.length > 0) {
       errors.map((e) => {
         addToast({
@@ -29,6 +32,7 @@ function LoginForm() {
       });
     }
   };
+
   return (
     <form className="my-6" action={handleLogin}>
       <Input
