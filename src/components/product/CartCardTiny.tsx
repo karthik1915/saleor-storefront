@@ -13,6 +13,7 @@ import {
   useDisclosure,
 } from "@heroui/react";
 import { useCart } from "@/app/products/[slug]/cartOperations";
+import { useUserStore } from "@/store";
 
 function CartCardTiny({ line }: { line: CheckoutLine }) {
   const variant = line.variant;
@@ -20,9 +21,11 @@ function CartCardTiny({ line }: { line: CheckoutLine }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { deleteItemFromCart } = useCart();
+  const removeCartItem = useUserStore((state) => state.removeLine);
 
   const handleDeleteItem = async () => {
     const res = await deleteItemFromCart([line.id]);
+    removeCartItem(line.id);
     if (res) {
       addToast({
         title: "Item Deleted from Cart",

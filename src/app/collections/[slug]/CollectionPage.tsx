@@ -95,7 +95,7 @@ function CollectionPage({ collectionSlug }: { collectionSlug: string }) {
                 No products found in this collection.
               </p>
             ) : (
-              <div className="flex flex-wrap items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4 justify-center">
                 {collection.products?.edges.map(({ node }) => (
                   <ProductCard key={node.id} product={node} />
                 ))}

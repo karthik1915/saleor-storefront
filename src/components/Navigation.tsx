@@ -53,19 +53,7 @@ export default function Navigation() {
   const user = useUserStore((s) => s.user);
   const lines = useUserStore((s) => s.lines);
 
-  const menuItems = [
-    "Profile",
-    "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
-    "Log Out",
-  ];
-
+  const menuItems = ["Profile", "Log In", "Log Out"];
   const topMenuItems = ["Products", "Categories", "Collections"];
 
   const { signOut } = useSaleorAuthContext();
@@ -176,31 +164,43 @@ export default function Navigation() {
             </DropdownTrigger>
             <DropdownMenu>
               {!user ? (
-                <DropdownItem
-                  key={"login"}
-                  onPress={() => router.push("/login")}
-                >
-                  Login
-                </DropdownItem>
+                <>
+                  <DropdownItem
+                    key={"login"}
+                    onPress={() => router.push("/login")}
+                  >
+                    Login
+                  </DropdownItem>
+                </>
               ) : (
-                <DropdownItem key={"logout"} onPress={handleLogout}>
-                  Logout
-                </DropdownItem>
+                <>
+                  <DropdownItem
+                    key={"profile"}
+                    onPress={() => router.push("/account")}
+                  >
+                    Profile
+                  </DropdownItem>
+                  <DropdownItem key={"logout"} onPress={handleLogout}>
+                    Logout
+                  </DropdownItem>
+                </>
               )}
             </DropdownMenu>
           </Dropdown>
         </NavbarItem>
 
         {!user && (
-          <NavbarItem className="hidden lg:flex">
-            <Button
-              onPress={() => router.push("/login")}
-              variant="faded"
-              className="text-md"
-            >
-              Login
-            </Button>
-          </NavbarItem>
+          <>
+            <NavbarItem className="hidden lg:flex">
+              <Button
+                onPress={() => router.push("/login")}
+                variant="faded"
+                className="text-md"
+              >
+                Login
+              </Button>
+            </NavbarItem>
+          </>
         )}
       </NavbarContent>
 
