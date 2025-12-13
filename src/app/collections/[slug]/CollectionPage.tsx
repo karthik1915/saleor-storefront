@@ -57,7 +57,7 @@ function CollectionPage({ collectionSlug }: { collectionSlug: string }) {
   const {
     data: collectionData,
     loading: collectionLoading,
-    error: collectionError,
+    // error: collectionError,
   } = useQuery<{ collection: Collection }>(getCollectionProducts, {
     variables: { slug: collectionSlug },
   });

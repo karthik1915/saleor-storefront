@@ -60,7 +60,7 @@ export function UserFetcher() {
     fetchPolicy: "network-only",
   });
 
-  console.log(data);
+  // console.log(data);
 
   const setUser = useUserStore((s) => s.setUser);
   const setLines = useUserStore((s) => s.setLines);
@@ -71,7 +71,7 @@ export function UserFetcher() {
       const lines = data.me.checkouts?.edges?.[0]?.node?.lines ?? [];
       setLines(lines);
     }
-  }, [data, loading]);
+  }, [data, loading, setLines, setUser]);
 
   return null;
 }

@@ -1,29 +1,70 @@
 name: Automated Test CICD
 
 on:
-    push:
-        branches:
-            - dev
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    cypress-run:
-        runs-on: ubuntu-24.04
+  ci:
+    runs-on: ubuntu-24.04
 
-        container:
-            image: cypress/browsers:22.15.0
-            options: --user 1001
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm run build
 
-            - name: Install dependencies
-              run: npm install
+  test:
+    needs: ci
+    runs-on: ubuntu-24.04
+    steps:
+      - run: npm start
+      - run: npm test -- --ci --coverage
 
-            - name: Cypress run
-              uses: cypress-io/github-action@v6
-              with:
-                  build: npm run build
-                  start: npm start
-                  wait-on: http://localhost:3000
-                  browser: chrome
+  e2e:
+    needs: ci
+    runs-on: ubuntu-24.04
+
+    container:
+      image: cypress/browsers:22.15.0
+      options: --user 1001
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run start &
+
+      - uses: cypress-io/github-action@v6
+        with:
+          wait-on: http://localhost:8000
+          browser: chrome
+
+  docker:
+    needs: [e2e, test]
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: aahrbitx/saleor-storefront:latest

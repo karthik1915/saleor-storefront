@@ -39,7 +39,7 @@ export default function CartTable() {
       <TableBody items={cartItems}>
         {(item) => {
           const flat = flatten(item);
-          console.log(flat);
+          // console.log(flat);
           return (
             <TableRow key={item.id}>
               {(columnKey) => (

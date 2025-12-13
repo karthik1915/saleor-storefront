@@ -8,8 +8,8 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
+    "test": "echo Testing is not set up yet!",
     "cy:open": "cypress open",
-    "tailwind-generate": "npx tailwindcss --input ./src/app/globals.css --output ./cypress/tailwind-generated.css",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "flat": "^6.0.1",
     "framer-motion": "^12.23.24",
     "graphql": "^16.12.0",
+    "lodash": "^4.17.21",
     "next": "15.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -32,6 +33,7 @@
     "@graphql-codegen/cli": "6.1.0",
     "@graphql-codegen/client-preset": "5.2.1",
     "@tailwindcss/postcss": "^4",
+    "@types/lodash": "^4.17.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

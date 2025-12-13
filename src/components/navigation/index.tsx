@@ -9,7 +9,6 @@ import {
   NavbarMenu,
   NavbarContent,
   NavbarItem,
-  Link as HeroLink,
   Button,
   Dropdown,
   DropdownTrigger,
@@ -26,10 +25,14 @@ import {
   DrawerFooter,
 } from "@heroui/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
-import CartCardTiny from "./product/CartCardTiny";
+import CartCardTiny from "../product/CartCardTiny";
 import { useUserStore } from "@/store/UserStore";
+import { useQuery } from "@apollo/client/react";
+import { getNavStructure } from "@/gql/queries/getNavStructure";
+import { Menu } from "@/gql/graphql";
+import NavDropDown from "./navDropdown";
 
 export const AcmeLogo = () => {
   return (
@@ -46,15 +49,22 @@ export const AcmeLogo = () => {
 
 export default function Navigation() {
   const router = useRouter();
-  const currPath = usePathname();
+  // const currPath = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const user = useUserStore((s) => s.user);
   const lines = useUserStore((s) => s.lines);
 
+  const { data: NavData, loading: NavLoading } = useQuery<{ menu: Menu }>(
+    getNavStructure,
+    {
+      fetchPolicy: "cache-first",
+    }
+  );
+
   const menuItems = ["Profile", "Log In", "Log Out"];
-  const topMenuItems = ["Products", "Categories", "Collections"];
+  // const topMenuItems = ["Products", "Categories", "Collections"];
 
   const { signOut } = useSaleorAuthContext();
 
@@ -64,7 +74,12 @@ export default function Navigation() {
   };
 
   return (
-    <Navbar isBordered isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
+    <Navbar
+      isBordered
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+      maxWidth="xl"
+    >
       <NavbarContent className="sm:hidden" justify="start">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -88,7 +103,9 @@ export default function Navigation() {
           </NavbarBrand>
         </Link>
 
-        {topMenuItems.map((item, index) => (
+        <NavDropDown menu={NavData} loading={NavLoading} />
+
+        {/* {topMenuItems.map((item, index) => (
           <NavbarItem
             key={index}
             isActive={currPath.startsWith(`/${item.toLowerCase()}`)}
@@ -97,13 +114,15 @@ export default function Navigation() {
               {item}
             </Link>
           </NavbarItem>
-        ))}
+        ))} */}
       </NavbarContent>
 
       <NavbarContent justify="end">
-        <NavbarItem>
-          <Button onPress={onOpen}>Cart</Button>
-        </NavbarItem>
+        {user && (
+          <NavbarItem>
+            <Button onPress={onOpen}>Cart</Button>
+          </NavbarItem>
+        )}
 
         <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
           <DrawerContent>
@@ -148,7 +167,7 @@ export default function Navigation() {
                 radius="full"
                 showFallback
                 classNames={{
-                  base: "bg-linear-to-br from-[#ffffaa] to-[#f1f1f1]",
+                  base: "bg-neutral-200",
                   icon: "text-black/80",
                 }}
                 className="text-md"
@@ -207,20 +226,9 @@ export default function Navigation() {
       <NavbarMenu>
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item}-${index}`}>
-            <HeroLink
-              className="w-full"
-              color={
-                index === 4
-                  ? "warning"
-                  : index === menuItems.length - 1
-                  ? "danger"
-                  : "foreground"
-              }
-              href="#"
-              size="lg"
-            >
+            <Link className="w-full" href="/products">
               {item}
-            </HeroLink>
+            </Link>
           </NavbarMenuItem>
         ))}
       </NavbarMenu>

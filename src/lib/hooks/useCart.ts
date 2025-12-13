@@ -8,7 +8,6 @@ import {
   CheckoutLinesAdd,
   CheckoutLinesDelete,
 } from "@/gql/graphql";
-import { addToast } from "@heroui/react";
 
 export function useCart() {
   const [fetchUserCheckouts] = useLazyQuery<{
@@ -25,8 +24,14 @@ export function useCart() {
     checkoutLinesDelete: CheckoutLinesDelete;
   }>(deleteCheckoutLineMutation);
 
-  const addItemToCart = async (variantId: string) => {
+  const addItemToCart = async (variantId: string | undefined) => {
+    if (!variantId) throw new Error("Invalid product variant.");
+
     const { data } = await fetchUserCheckouts();
+
+    if (data!.me === null)
+      throw new Error("Please login to add items to cart.");
+
     const checkout = data?.me.checkouts.edges[0]?.node;
 
     if (!checkout) {

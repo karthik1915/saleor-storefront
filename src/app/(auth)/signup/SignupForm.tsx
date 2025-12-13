@@ -8,8 +8,7 @@ import { addToast, Button, Input } from "@heroui/react";
 import { CUSTOMER_CREATE } from "./customerCreate";
 
 function SignupForm() {
-  const [registerAccount, { data, loading, error }] =
-    useMutation(CUSTOMER_CREATE);
+  const [registerAccount, { error }] = useMutation(CUSTOMER_CREATE);
 
   const handleSignup = async (formData: FormData) => {
     const input = {

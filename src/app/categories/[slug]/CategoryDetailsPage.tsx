@@ -84,28 +84,34 @@ function CategoryDetailsPage({ categorySlug }: { categorySlug: string }) {
   const {
     data: categoryData,
     loading: categoryLoading,
-    error: categoryError,
+    // error: categoryError,
   } = useQuery<{ category: Category }>(getCategoryDetails, {
     variables: {
       slug: categorySlug,
     },
   });
 
-  const category = categoryData?.category!;
-
-  if (!categoryData && !categoryLoading) {
-    return <p className="text-center my-4">No category found.</p>;
-  }
+  const category = categoryData?.category;
+  const categoryId = category?.id;
 
   const {
     data: productsData,
     loading: productsLoading,
-    error: productsError,
+    // error: productsError,
   } = useQuery<{ products: ProductCountableConnection }>(getCategoryProducts, {
     variables: {
       id: categoryData?.category.id,
     },
+    skip: !categoryId,
   });
+
+  if (categoryLoading) {
+    return <p className="text-center my-4">Loading category details...</p>;
+  }
+
+  if (!category) {
+    return <p className="text-center my-4">No category found.</p>;
+  }
 
   return (
     <>
@@ -130,24 +136,25 @@ function CategoryDetailsPage({ categorySlug }: { categorySlug: string }) {
               </div>
             )}
           </section>
-          <section className="my-6">
-            <h2 className="font-semibold text-xl">Sub Categories</h2>
-            {category.children?.edges.length === 0 ? (
-              <p className="text-gray-500 mt-2">No subcategories available.</p>
-            ) : (
-              <div className="flex items-center gap-4 mt-4">
-                {category.children?.edges.map(({ node }) => (
-                  <Link
-                    href={`/categories/${node.slug}`}
-                    key={node.name}
-                    className="p-8 border-2 border-violet-500 rounded-sm"
-                  >
-                    {node.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </section>
+          {
+            /* Sub Categories Section */
+            category.children && category.children?.edges.length > 0 && (
+              <section className="my-6">
+                <h2 className="font-semibold text-xl">Sub Categories</h2>
+                <div className="flex items-center gap-4 mt-4">
+                  {category.children?.edges.map(({ node }) => (
+                    <Link
+                      href={`/categories/${node.slug}`}
+                      key={node.name}
+                      className="p-8 border-2 border-violet-500 rounded-sm"
+                    >
+                      {node.name}
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )
+          }
         </>
       )}
     </>

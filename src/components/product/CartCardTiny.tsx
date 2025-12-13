@@ -12,7 +12,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import { useCart } from "@/app/products/[slug]/cartOperations";
+import { useCart } from "@/lib/hooks/useCart";
 import { useUserStore } from "@/store";
 
 function CartCardTiny({ line }: { line: CheckoutLine }) {

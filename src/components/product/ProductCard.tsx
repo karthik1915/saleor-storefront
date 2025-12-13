@@ -15,14 +15,14 @@ function ProductCard({ product }: { product: Product }) {
     >
       <CardBody className="overflow-visible p-0">
         <Image
-          alt={product.thumbnail?.alt || product.name}
-          className="w-full object-cover h-[260px]"
-          src={product.thumbnail?.url || "/generic-image-placeholder.webp"}
+          alt={product.media?.[0]?.alt || product.name}
+          className="w-full object-cover h-[296px]"
+          src={product.media?.[0]?.url || "/generic-image-placeholder.webp"}
           width={400}
           height={600}
         />
       </CardBody>
-      <CardFooter className="text-small justify-between">
+      <CardFooter className="text-small justify-between bg-neutral-200">
         <b>{product.name}</b>
         <p className="text-default-500">
           {product.defaultVariant?.pricing?.price?.gross.amount}{" "}

@@ -2,10 +2,7 @@
 
 import React from "react";
 import { gql } from "@apollo/client";
-import {
-  CategoryCountableConnection,
-  CollectionCountableConnection,
-} from "@/gql/graphql";
+import { CategoryCountableConnection } from "@/gql/graphql";
 import { useQuery } from "@apollo/client/react";
 import { Button } from "@heroui/react";
 import Link from "next/link";

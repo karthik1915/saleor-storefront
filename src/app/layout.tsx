@@ -9,7 +9,8 @@ import { appData } from "@/lib/data";
 // Providers
 import AppProvider from "@/lib/providers/Provider";
 // UI
-import Navigation from "@/components/Navigation";
+import Navigation from "@/components/navigation";
+import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: appData.name,
@@ -29,6 +30,7 @@ export default function RootLayout({
         <AppProvider>
           <Navigation />
           {children}
+          <Footer />
         </AppProvider>
       </body>
     </html>
