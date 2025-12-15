@@ -3,10 +3,10 @@
 import { gql } from "@apollo/client";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import {
-  CheckoutCountableConnection,
   CheckoutCreate,
   CheckoutLinesAdd,
   CheckoutLinesDelete,
+  CheckoutCountableConnection,
 } from "@/gql/graphql";
 
 export function useCart() {
@@ -23,6 +23,9 @@ export function useCart() {
   const [deleteCheckoutLine] = useMutation<{
     checkoutLinesDelete: CheckoutLinesDelete;
   }>(deleteCheckoutLineMutation);
+  const [updateCheckoutLine] = useMutation<{
+    checkoutLinesUpdate: CheckoutLinesAdd;
+  }>(checkoutLineUpdateMutation);
 
   const addItemToCart = async (variantId: string | undefined) => {
     if (!variantId) throw new Error("Invalid product variant.");
@@ -60,10 +63,39 @@ export function useCart() {
       variables: { checkoutId, lineIds },
     });
 
-    return res.data?.checkoutLinesDelete.checkout?.id;
+    return res.data?.checkoutLinesDelete.checkout;
   };
 
-  return { addItemToCart, deleteItemFromCart };
+  const increaseCartItem = async (variantId: string | undefined) => {
+    return addItemToCart(variantId);
+  };
+
+  const decreaseCartItem = async (lineId: string) => {
+    const { data } = await fetchUserCheckouts();
+    const checkout = data?.me.checkouts.edges[0]?.node;
+    const checkoutId = checkout!.id;
+
+    const line = checkout?.lines.find((l) => l.id === lineId);
+    if (!line) throw new Error("Line item not found in checkout.");
+
+    const newQuantity = line.quantity - 1;
+    if (newQuantity < 1) {
+      return deleteItemFromCart([lineId]);
+    }
+    console.table({ newQuantity, lineId, checkoutId });
+
+    const res = await updateCheckoutLine({
+      variables: { checkoutId, lineId, quantity: newQuantity },
+    });
+    return res.data?.checkoutLinesUpdate.checkout?.lines;
+  };
+
+  return {
+    addItemToCart,
+    deleteItemFromCart,
+    increaseCartItem,
+    decreaseCartItem,
+  };
 }
 
 const getAllCheckoutsOfCurrUser = gql`
@@ -73,6 +105,32 @@ const getAllCheckoutsOfCurrUser = gql`
         edges {
           node {
             id
+            totalPrice {
+              gross {
+                amount
+              }
+              net {
+                amount
+              }
+              tax {
+                amount
+              }
+            }
+            lines {
+              id
+              quantity
+              totalPrice {
+                gross {
+                  amount
+                }
+                net {
+                  amount
+                }
+                tax {
+                  amount
+                }
+              }
+            }
           }
         }
       }
@@ -90,6 +148,17 @@ const createCheckoutMutation = gql`
     ) {
       checkout {
         id
+        totalPrice {
+          gross {
+            amount
+          }
+          net {
+            amount
+          }
+          tax {
+            amount
+          }
+        }
         lines {
           id
           variant {
@@ -98,6 +167,12 @@ const createCheckoutMutation = gql`
           quantity
           totalPrice {
             gross {
+              amount
+            }
+            net {
+              amount
+            }
+            tax {
               amount
             }
           }
@@ -115,6 +190,17 @@ const addCheckoutLineMutation = gql`
     ) {
       checkout {
         id
+        totalPrice {
+          gross {
+            amount
+          }
+          net {
+            amount
+          }
+          tax {
+            amount
+          }
+        }
         lines {
           id
           variant {
@@ -123,6 +209,12 @@ const addCheckoutLineMutation = gql`
           quantity
           totalPrice {
             gross {
+              amount
+            }
+            net {
+              amount
+            }
+            tax {
               amount
             }
           }
@@ -137,6 +229,75 @@ const deleteCheckoutLineMutation = gql`
     checkoutLinesDelete(id: $checkoutId, linesIds: $lineIds) {
       checkout {
         id
+        totalPrice {
+          gross {
+            amount
+          }
+          net {
+            amount
+          }
+          tax {
+            amount
+          }
+        }
+        totalPrice {
+          gross {
+            amount
+          }
+          net {
+            amount
+          }
+          tax {
+            amount
+          }
+        }
+      }
+      errors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+const checkoutLineUpdateMutation = gql`
+  mutation updateCheckoutLine($checkoutId: ID!, $lineId: ID!, $quantity: Int!) {
+    checkoutLinesUpdate(
+      checkoutId: $checkoutId
+      lines: [{ lineId: $lineId, quantity: $quantity }]
+    ) {
+      checkout {
+        id
+        totalPrice {
+          gross {
+            amount
+          }
+          net {
+            amount
+          }
+          tax {
+            amount
+          }
+        }
+        lines {
+          id
+          variant {
+            id
+          }
+          quantity
+          totalPrice {
+            gross {
+              amount
+            }
+            net {
+              amount
+            }
+            tax {
+              amount
+            }
+          }
+        }
       }
       errors {
         field

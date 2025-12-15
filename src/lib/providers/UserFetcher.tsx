@@ -20,11 +20,29 @@ const USER_QUERY = gql`
         edges {
           node {
             id
+            totalPrice {
+              gross {
+                amount
+              }
+              net {
+                amount
+              }
+              tax {
+                amount
+              }
+            }
             lines {
               id
               variant {
                 id
                 name
+                pricing {
+                  price {
+                    gross {
+                      amount
+                    }
+                  }
+                }
                 product {
                   id
                   name
@@ -51,6 +69,23 @@ const USER_QUERY = gql`
           }
         }
       }
+      defaultShippingAddress {
+        id
+        firstName
+        lastName
+        streetAddress1
+        streetAddress2
+        city
+        cityArea
+        country {
+          code
+          country
+        }
+        countryArea
+        postalCode
+        isDefaultBillingAddress
+        isDefaultShippingAddress
+      }
     }
   }
 `;
@@ -63,12 +98,20 @@ export function UserFetcher() {
   // console.log(data);
 
   const setUser = useUserStore((s) => s.setUser);
+  const setCheckoutData = useUserStore((s) => s.setCheckoutData);
   const setLines = useUserStore((s) => s.setLines);
 
   useEffect(() => {
     if (data?.me) {
       setUser(data.me);
-      const lines = data.me.checkouts?.edges?.[0]?.node?.lines ?? [];
+      const checkout = data.me.checkouts?.edges?.[0]?.node;
+      const lines = checkout?.lines ?? [];
+      if (checkout) {
+        const { lines: _, ...checkoutWithoutLines } = checkout;
+        setCheckoutData(checkoutWithoutLines);
+      } else {
+        setCheckoutData(null);
+      }
       setLines(lines);
     }
   }, [data, loading, setLines, setUser]);

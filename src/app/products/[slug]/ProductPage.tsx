@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { useQuery } from "@apollo/client/react";
 import { Product } from "@/gql/graphql";
-import { addToast, Button } from "@heroui/react";
+import { addToast, Button, Chip } from "@heroui/react";
 import { useCart } from "@/lib/hooks/useCart";
 import { parseDescriptionJson } from "@/utils/description_json_parser";
 import { getProductBySlug } from "@/gql/queries/getProductBySlug";
@@ -60,7 +60,7 @@ const ProductDetails = ({ product }: { product: Product }) => {
   return (
     <>
       <h1 className="text-center text-2xl font-semibold">{product.name}</h1>
-      <span>{productType}</span>
+      <Chip>{productType}</Chip>
 
       <p className="text-center" dangerouslySetInnerHTML={{ __html: desc }} />
 

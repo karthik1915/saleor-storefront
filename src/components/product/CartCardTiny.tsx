@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { CheckoutLine } from "@/gql/graphql";
-import { addToast, Button, Chip } from "@heroui/react";
+import { addToast, Button, Card, Chip } from "@heroui/react";
 import { IconTrash } from "@tabler/icons-react";
 
 import {
@@ -14,8 +14,11 @@ import {
 } from "@heroui/react";
 import { useCart } from "@/lib/hooks/useCart";
 import { useUserStore } from "@/store";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function CartCardTiny({ line }: { line: CheckoutLine }) {
+  const router = useRouter();
   const variant = line.variant;
   const variantName = variant.name === variant.id ? "default" : variant.name;
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -44,7 +47,7 @@ function CartCardTiny({ line }: { line: CheckoutLine }) {
 
   return (
     <>
-      <div className="flex items-center rounded-xl shadow-sm pr-2">
+      <Card className="flex items-center rounded-xl pr-2 cursor-pointer flex-row">
         <div className="size-32">
           <Image
             src={
@@ -57,7 +60,12 @@ function CartCardTiny({ line }: { line: CheckoutLine }) {
           />
         </div>
         <div className="flex-1 mx-2.5">
-          <p className="text-xl">{variant.product.name}</p>
+          <Link
+            href={"/products/" + variant.product.slug}
+            className="text-xl hover:underline block"
+          >
+            {variant.product.name}
+          </Link>
           <Chip size="sm">{variantName}</Chip>
           <p className="text-neutral-600 italic">
             {line.quantity} X {line.unitPrice.gross.amount} ={" "}
@@ -69,7 +77,7 @@ function CartCardTiny({ line }: { line: CheckoutLine }) {
             <IconTrash />
           </Button>
         </div>
-      </div>
+      </Card>
       <Modal backdrop={"opaque"} isOpen={isOpen} onClose={onClose}>
         <ModalContent>
           <ModalHeader>Are You Sure?</ModalHeader>

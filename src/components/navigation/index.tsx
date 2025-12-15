@@ -15,6 +15,8 @@ import {
   DropdownMenu,
   DropdownItem,
   useDisclosure,
+  Badge,
+  Input,
 } from "@heroui/react";
 import { Avatar } from "@heroui/avatar";
 import {
@@ -25,7 +27,7 @@ import {
   DrawerFooter,
 } from "@heroui/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
 import CartCardTiny from "../product/CartCardTiny";
 import { useUserStore } from "@/store/UserStore";
@@ -33,6 +35,7 @@ import { useQuery } from "@apollo/client/react";
 import { getNavStructure } from "@/gql/queries/getNavStructure";
 import { Menu } from "@/gql/graphql";
 import NavDropDown from "./navDropdown";
+import { IconSearch, IconShoppingBag } from "@tabler/icons-react";
 
 export const AcmeLogo = () => {
   return (
@@ -49,7 +52,6 @@ export const AcmeLogo = () => {
 
 export default function Navigation() {
   const router = useRouter();
-  // const currPath = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -64,7 +66,6 @@ export default function Navigation() {
   );
 
   const menuItems = ["Profile", "Log In", "Log Out"];
-  // const topMenuItems = ["Products", "Categories", "Collections"];
 
   const { signOut } = useSaleorAuthContext();
 
@@ -95,7 +96,9 @@ export default function Navigation() {
         </Link>
       </NavbarContent>
 
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      <NavbarContent className="hidden sm:flex gap-4 w-full justify-between!">
+        <NavDropDown menu={NavData} loading={NavLoading} />
+
         <Link href="/">
           <NavbarBrand>
             <AcmeLogo />
@@ -103,124 +106,123 @@ export default function Navigation() {
           </NavbarBrand>
         </Link>
 
-        <NavDropDown menu={NavData} loading={NavLoading} />
+        <div className="flex items-center justify-end gap-4">
+          <Input
+            type="text"
+            className="w-46"
+            variant="faded"
+            startContent={<IconSearch />}
+            placeholder="Search..."
+          />
+          {user && (
+            <NavbarItem>
+              <Badge content={lines.length} color="primary" shape="circle">
+                <Button
+                  onPress={onOpen}
+                  variant="faded"
+                  isIconOnly
+                  className="rounded-full"
+                  size="md"
+                  aria-label="Open Cart"
+                >
+                  <IconShoppingBag />
+                </Button>
+              </Badge>
+            </NavbarItem>
+          )}
 
-        {/* {topMenuItems.map((item, index) => (
-          <NavbarItem
-            key={index}
-            isActive={currPath.startsWith(`/${item.toLowerCase()}`)}
-          >
-            <Link color="foreground" href={`/${item.toLowerCase()}`}>
-              {item}
-            </Link>
-          </NavbarItem>
-        ))} */}
-      </NavbarContent>
-
-      <NavbarContent justify="end">
-        {user && (
-          <NavbarItem>
-            <Button onPress={onOpen}>Cart</Button>
-          </NavbarItem>
-        )}
-
-        <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
-          <DrawerContent>
-            {(onClose) => (
-              <>
-                <DrawerHeader className="flex flex-col gap-1">
-                  My Cart
-                </DrawerHeader>
-                <DrawerBody>
-                  {lines.length === 0 ? (
-                    <p>You Cart is Empty</p>
-                  ) : (
-                    lines.map((line) => (
-                      <CartCardTiny key={line.id} line={line} />
-                    ))
-                  )}
-                </DrawerBody>
-                <DrawerFooter>
-                  <Button color="danger" variant="light" onPress={onClose}>
-                    Close
-                  </Button>
-                  <Button
-                    color="primary"
-                    onPress={() => {
-                      router.push("/checkout");
-                      onClose();
-                    }}
-                  >
-                    Checkout
-                  </Button>
-                </DrawerFooter>
-              </>
-            )}
-          </DrawerContent>
-        </Drawer>
-
-        <NavbarItem>
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger className="cursor-pointer">
-              <Avatar
-                isBordered
-                radius="full"
-                showFallback
-                classNames={{
-                  base: "bg-neutral-200",
-                  icon: "text-black/80",
-                }}
-                className="text-md"
-                color={user ? "success" : "default"}
-                name={
-                  user
-                    ? user.firstName?.trim()
-                      ? `${user.firstName} ${user.lastName ?? ""}`.trim()
-                      : user.email
-                    : "Guest"
-                }
-              />
-            </DropdownTrigger>
-            <DropdownMenu>
-              {!user ? (
+          <Drawer isOpen={isOpen} onOpenChange={onOpenChange}>
+            <DrawerContent>
+              {(onClose) => (
                 <>
-                  <DropdownItem
-                    key={"login"}
-                    onPress={() => router.push("/login")}
-                  >
-                    Login
-                  </DropdownItem>
-                </>
-              ) : (
-                <>
-                  <DropdownItem
-                    key={"profile"}
-                    onPress={() => router.push("/account")}
-                  >
-                    Profile
-                  </DropdownItem>
-                  <DropdownItem key={"logout"} onPress={handleLogout}>
-                    Logout
-                  </DropdownItem>
+                  <DrawerHeader className="flex flex-col gap-1">
+                    My Cart
+                  </DrawerHeader>
+                  <DrawerBody>
+                    {lines.length === 0 ? (
+                      <p>You Cart is Empty</p>
+                    ) : (
+                      lines.map((line) => (
+                        <CartCardTiny key={line.id} line={line} />
+                      ))
+                    )}
+                  </DrawerBody>
+                  <DrawerFooter>
+                    <Button color="danger" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    <Button color="primary" as={Link} href="/cart">
+                      View Cart
+                    </Button>
+                  </DrawerFooter>
                 </>
               )}
-            </DropdownMenu>
-          </Dropdown>
-        </NavbarItem>
+            </DrawerContent>
+          </Drawer>
 
-        {!user && (
-          <>
-            <NavbarItem className="hidden lg:flex">
-              <Button
-                onPress={() => router.push("/login")}
-                variant="faded"
-                className="text-md"
-              >
-                Login
-              </Button>
-            </NavbarItem>
-          </>
-        )}
+          <NavbarItem>
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger className="cursor-pointer">
+                <Avatar
+                  isBordered
+                  radius="full"
+                  showFallback
+                  classNames={{
+                    base: "bg-neutral-200",
+                    icon: "text-black/80",
+                  }}
+                  size="sm"
+                  color={user ? "success" : "default"}
+                  name={
+                    user
+                      ? user.firstName?.trim()
+                        ? `${user.firstName} ${user.lastName ?? ""}`.trim()
+                        : user.email
+                      : "Guest"
+                  }
+                />
+              </DropdownTrigger>
+              <DropdownMenu>
+                {!user ? (
+                  <>
+                    <DropdownItem
+                      key={"login"}
+                      onPress={() => router.push("/login")}
+                    >
+                      Login
+                    </DropdownItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownItem
+                      key={"profile"}
+                      onPress={() => router.push("/account")}
+                    >
+                      Profile
+                    </DropdownItem>
+                    <DropdownItem key={"logout"} onPress={handleLogout}>
+                      Logout
+                    </DropdownItem>
+                  </>
+                )}
+              </DropdownMenu>
+            </Dropdown>
+          </NavbarItem>
+
+          {!user && (
+            <>
+              <NavbarItem className="hidden lg:flex">
+                <Button
+                  onPress={() => router.push("/login")}
+                  variant="faded"
+                  className="text-md"
+                >
+                  Login
+                </Button>
+              </NavbarItem>
+            </>
+          )}
+        </div>
       </NavbarContent>
 
       <NavbarMenu>
