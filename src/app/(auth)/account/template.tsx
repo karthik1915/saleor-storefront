@@ -11,10 +11,18 @@ import {
   IconHeart,
   IconMapPin,
   IconTruckDelivery,
+  IconUser,
+  IconUserSquareRounded,
 } from "@tabler/icons-react";
+import { usePathname } from "next/navigation";
 
 function AccountLayout({ children }: { children: React.ReactNode }) {
   const sidebarItems = [
+    {
+      href: "/account",
+      icon: IconUserSquareRounded,
+      label: "Personal Info",
+    },
     {
       href: "/account/orders",
       icon: IconTruckDelivery,
@@ -43,15 +51,29 @@ function AccountLayout({ children }: { children: React.ReactNode }) {
   ];
 
   const { signOut } = useSaleorAuthContext();
+  const currPath = usePathname();
+  const isActive = (href: string) => {
+    if (href === "/account") {
+      return currPath === "/account";
+    }
+    return currPath.startsWith(href);
+  };
+
   return (
     <main className="container mx-auto my-8">
       <div>
-        <h1 className="text-2xl font-semibold">Your Account</h1>
+        <h1 className="text-2xl font-semibold px-8">Your Account</h1>
       </div>
       <div className="grid grid-cols-[250px_1fr] my-6 ">
-        <div className="flex flex-col gap-2 items-stretch justify-center px-5 *:justify-start">
+        <div className="flex flex-col gap-2 items-stretch px-5 *:justify-start ">
           {sidebarItems.map(({ href, icon: Icon, label }) => (
-            <Button as={Link} href={href} key={href} variant="bordered">
+            <Button
+              as={Link}
+              href={href}
+              key={href}
+              variant="flat"
+              color={isActive(href) ? "secondary" : "default"}
+            >
               <Icon />
               {label}
             </Button>

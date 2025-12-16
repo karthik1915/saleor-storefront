@@ -14,7 +14,6 @@ import { useUserStore } from "@/store";
 import { useQuery } from "@apollo/client/react";
 import { Checkout } from "@/gql/graphql";
 import { getCheckoutData } from "@/gql/queries/getCheckoutData";
-import { c } from "@apollo/client/react/internal/compiler-runtime";
 
 function CustomerInfo() {
   const userData = useUserStore((state) => state.user);
