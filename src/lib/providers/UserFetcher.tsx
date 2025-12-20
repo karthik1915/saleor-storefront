@@ -9,6 +9,7 @@ import { useQuery } from "@apollo/client/react";
 const USER_QUERY = gql`
   query me {
     me {
+      id
       firstName
       email
       lastName
@@ -86,6 +87,23 @@ const USER_QUERY = gql`
         isDefaultBillingAddress
         isDefaultShippingAddress
       }
+      defaultBillingAddress {
+        id
+        firstName
+        lastName
+        streetAddress1
+        streetAddress2
+        city
+        cityArea
+        country {
+          code
+          country
+        }
+        countryArea
+        postalCode
+        isDefaultBillingAddress
+        isDefaultShippingAddress
+      }
     }
   }
 `;
@@ -95,7 +113,7 @@ export function UserFetcher() {
     fetchPolicy: "network-only",
   });
 
-  // console.log(data);
+  console.log(data);
 
   const setUser = useUserStore((s) => s.setUser);
   const setCheckoutData = useUserStore((s) => s.setCheckoutData);

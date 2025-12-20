@@ -8,6 +8,7 @@ import {
   cn,
   VisuallyHidden,
   useRadio,
+  Switch,
 } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { useUserStore } from "@/store";
@@ -29,16 +30,12 @@ function CustomerInfo() {
   if (!userData || checkoutLoading) {
     return <div>Loading...</div>;
   }
-  console.log("checkoutData in CustomerInfo:", checkoutData);
 
   // Extract checkout shipping address (if checkout exists)
   const checkoutAddress = checkoutData?.checkout.shippingAddress || null;
 
-  // Extract default user shipping address
-  const defaultUserAddress = userData.defaultShippingAddress || null;
-
   // FINAL ADDRESS (priority: checkout > default user address)
-  const address = checkoutAddress || defaultUserAddress;
+  const address = checkoutAddress || userData.defaultShippingAddress || null;
 
   return (
     <div className="space-y-4">
@@ -50,10 +47,9 @@ function CustomerInfo() {
       {/* Shipping Section */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Shipping Address</h2>
-        <div className="text-sm text-neutral-700">
-          <Checkbox id="default-address-check" size="sm">
-            Save as default shipping address
-          </Checkbox>
+        <div className="text-sm text-neutral-700 flex items-center justify-center gap-4">
+          <span>Use default Shipping address</span>
+          <Switch size="sm" />
         </div>
       </div>
 

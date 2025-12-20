@@ -25,7 +25,6 @@ function SignupForm() {
     };
 
     const res = await registerAccount({ variables: { input } });
-    console.log("Signup Response:", res);
 
     if (error) {
       addToast({

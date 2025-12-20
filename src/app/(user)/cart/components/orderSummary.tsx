@@ -8,10 +8,7 @@ import React from "react";
 
 function OrderSummary() {
   const checkoutData = useUserStore((state) => state.checkoutData);
-  console.log(
-    "checkoutData in OrderSummary:",
-    checkoutData?.totalPrice?.gross?.amount
-  );
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold">Order Summary</h2>
