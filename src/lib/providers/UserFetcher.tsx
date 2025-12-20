@@ -17,10 +17,23 @@ const USER_QUERY = gql`
         alt
         url
       }
+      metadata {
+        key
+        value
+      }
       checkouts(first: 1) {
         edges {
           node {
             id
+            voucher {
+              name
+              discountValue
+              discountValueType
+            }
+            voucherCode
+            discount {
+              amount
+            }
             totalPrice {
               gross {
                 amount
@@ -65,6 +78,9 @@ const USER_QUERY = gql`
                   amount
                   currency
                 }
+              }
+              undiscountedTotalPrice {
+                amount
               }
             }
           }

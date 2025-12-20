@@ -6,10 +6,15 @@ import React from "react";
 
 function AdditionalCheckoutDetails() {
   const checkoutData = useUserStore((state) => state.checkoutData);
+  const voucherCode = checkoutData?.voucher?.code;
   return (
     <div className="p-6">
       <div className="flex items-center gap-2">
-        <Input placeholder="Coupon Code or Gift Card" disabled />
+        <Input
+          placeholder="Coupon Code or Gift Card"
+          disabled
+          value={voucherCode ?? ""}
+        />
       </div>
       <table className="w-full border-separate border-spacing-y-4 p-4 text-lg">
         <tbody>

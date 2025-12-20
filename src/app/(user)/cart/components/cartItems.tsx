@@ -7,6 +7,7 @@ import { CheckoutLine } from "@/gql/graphql";
 import { Button, ButtonGroup } from "@heroui/react";
 import { IconTrash } from "@tabler/icons-react";
 import { useCart } from "@/lib/hooks/useCart";
+import CalculatedPrice from "@/components/product/CalculatedPrice";
 
 function CartItems({ disableEditing = false }: { disableEditing?: boolean }) {
   const checkoutLines = useUserStore((state) => state.lines);
@@ -61,7 +62,11 @@ const CartItemCart = ({
           </p>
           <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
           <p className="text-2xl font-semibold mt-3">
-            ${item.totalPrice.gross.amount}
+            <CalculatedPrice
+              price={item.undiscountedTotalPrice.amount}
+              discountedPrice={item.totalPrice.gross.amount}
+            />
+            $
           </p>
         </div>
         {disableEditing ? (

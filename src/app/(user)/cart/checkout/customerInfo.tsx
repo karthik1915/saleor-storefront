@@ -2,13 +2,11 @@
 
 import React from "react";
 import {
-  RadioGroup,
-  Checkbox,
-  Button,
   cn,
+  RadioGroup,
+  Button,
   VisuallyHidden,
   useRadio,
-  Switch,
 } from "@heroui/react";
 import { Input } from "@heroui/react";
 import { useUserStore } from "@/store";
@@ -31,6 +29,8 @@ function CustomerInfo() {
     return <div>Loading...</div>;
   }
 
+  const handlePayment = () => {};
+
   // Extract checkout shipping address (if checkout exists)
   const checkoutAddress = checkoutData?.checkout.shippingAddress || null;
 
@@ -47,10 +47,6 @@ function CustomerInfo() {
       {/* Shipping Section */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Shipping Address</h2>
-        <div className="text-sm text-neutral-700 flex items-center justify-center gap-4">
-          <span>Use default Shipping address</span>
-          <Switch size="sm" />
-        </div>
       </div>
 
       {/* Name Fields */}
@@ -122,7 +118,12 @@ function CustomerInfo() {
         </CustomRadio>
       </RadioGroup>
 
-      <Button className="mt-4 h-12 text-lg" color="primary" fullWidth>
+      <Button
+        className="mt-4 h-12 text-lg"
+        color="primary"
+        fullWidth
+        onPress={handlePayment}
+      >
         Continue to Payment
       </Button>
     </div>
